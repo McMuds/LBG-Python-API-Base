@@ -6,7 +6,7 @@ cffi
 charset-normalizer
 click
 colorama
-Flask
+Flask==2.2
 Flask-API
 Flask-SQLAlchemy
 greenlet
@@ -30,5 +30,5 @@ SQLAlchemy
 trio
 trio-websocket
 urllib3
-Werkzeug
+Werkzeug==2.3
 wsproto

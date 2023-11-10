@@ -53,6 +53,7 @@ def create_table():
     Note. If API non-persistence required, data DB will need to be reset (API controls id statelessly)
     i.e. no db look up for max id value for restart.  A possible enhancement.
     """
+    db.drop_all()
     db.create_all()
 
 

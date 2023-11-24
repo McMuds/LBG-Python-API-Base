@@ -25,13 +25,31 @@ pipeline {
             }
 
         }
+        stage('Staging Deploy'){
+            steps {
+                sh '''
+                kubectl apply -f deployment.yaml --namespace staging
+                '''
+            }
+        }
+        stage('Quality Check') {
+            steps {
+                sh '''
+                sleep 50
+                export STAGING_IP=\$(kubectl get svc -o json --namespace staging | jq '.items[] | select(.metadata.name == "flask-service") | .status.loadBalancer.ingress[0].ip' | tr -d '"')
+                pip3 install requests
+                python3 lbg-test.py
+                '''
+            }
+        }
+
 
         stage('Deploy to GKE'){
             steps {
                 script {
                     //deploy to GKE using Jenkins K8 Engine Plugin
                     step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, \
-                    location: env.LOCATION, manifestPattern: 'kubernetes/deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+                    location: env.LOCATION, namespace: 'prod', manifestPattern: 'kubernetes/deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
                 }
             }
         }

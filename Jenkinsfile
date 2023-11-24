@@ -25,11 +25,20 @@ pipeline {
             }
 
         }
-        stage('Staging Deploy'){
+        stage('Staging Deploy to GKE'){
             steps {
-                sh '''
-                kubectl apply -f deployment.yaml --namespace staging
-                '''
+                script {
+                    //deploy to GKE using Jenkins K8 Engine Plugin
+                    step([
+                        $class: 'KubernetesEngineBuilder', 
+                        projectId: env.PROJECT_ID, 
+                        clusterName: env.CLUSTER_NAME, 
+                        location: env.LOCATION, 
+                        namespace: 'staging', 
+                        manifestPattern: 'kubernetes/deployment.yaml', 
+                        credentialsId: env.CREDENTIALS_ID, 
+                        verifyDeployments: true])
+                }
             }
         }
         stage('Quality Check') {
@@ -48,8 +57,15 @@ pipeline {
             steps {
                 script {
                     //deploy to GKE using Jenkins K8 Engine Plugin
-                    step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, \
-                    location: env.LOCATION, namespace: 'prod', manifestPattern: 'kubernetes/deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+                    step([
+                        $class: 'KubernetesEngineBuilder', 
+                        projectId: env.PROJECT_ID, 
+                        clusterName: env.CLUSTER_NAME,
+                        location: env.LOCATION, 
+                        namespace: 'prod', 
+                        manifestPattern: 'kubernetes/deployment.yaml', 
+                        credentialsId: env.CREDENTIALS_ID, 
+                        verifyDeployments: true])
                 }
             }
         }

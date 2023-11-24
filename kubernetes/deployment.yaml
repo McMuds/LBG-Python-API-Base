@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
       - name: flask-container
-        image: gcr.io/lbg-uplift-project/test-image-5:latest
+        image: gcr.io/lbg-mea-15/claire-test-build-1:6
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
